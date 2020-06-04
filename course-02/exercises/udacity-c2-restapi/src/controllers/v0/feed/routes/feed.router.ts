@@ -29,8 +29,20 @@ router.get('/:id', async (req: Request, res: Response) => {
 router.patch('/:id', 
     requireAuth, 
     async (req: Request, res: Response) => {
-        //@TODO try it yourself
-        res.send(500).send("not implemented")
+        const id = req.body.id
+        const caption = req.body.caption
+        const url = req.body.url
+        console.log("patch id")
+        if(!id){return res.status(400).send({ message: 'id is not defined' });}
+        if(!caption){return res.status(400).send({ message: 'caption is not defined' });}
+        if(!url){return res.status(400).send({ message: 'url is not defined' });}
+
+        const item = await FeedItem.findByPk(id);
+        item.update({url:url, caption:caption})
+        
+        console.log('updated');
+
+        res.send(204).send("update")
 });
 
 
