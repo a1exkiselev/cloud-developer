@@ -1,5 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
+import { Router, Request, Response } from 'express';
+
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
 (async () => {
@@ -31,6 +33,26 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
   //! END @TODO1
   
+  //Add an endpoint to GET a specific resource by Primary Key
+  //app.get('/filteredimage/:image_url', async (req: Request, res: Response) => { unfortunately was not working, that why I changed to query
+
+  app.get('/filteredimage', async (req: Request, res: Response) => {
+    console.log("test")
+    const image_url = req.query.image_url
+    console.log(image_url)
+
+    // check Filename is valid
+    if (!image_url) {
+        return res.status(400).send({ message: 'File image_url is required' });
+    }
+    const filteredpath = await filterImageFromURL(image_url)
+    // send ok and the picture
+    res.status(200).sendFile(filteredpath);
+
+    //after response is finished delete file
+    res.on("finish",()=>deleteLocalFiles([filteredpath]));
+  });
+
   // Root Endpoint
   // Displays a simple message to the user
   app.get( "/", async ( req, res ) => {
